@@ -54,13 +54,58 @@ module RedmineWebhook
 
     private
     def issue_to_json(issue, controller)
-      {
-        :payload => {
-          :action => 'opened',
-          :issue => RedmineWebhook::IssueWrapper.new(issue).to_hash,
-          :url => controller.issue_url(issue)
+      msg = {
+        :project_name => issue.project,
+        :author => issue.author.to_s,
+        :action => "created",
+        :link => object_url(issue),
+        :issue => issue,
+        :mentions => "#{mentions issue.description}"
+      }
+      card = {}
+      card[:header] = {
+        :title => "#{msg[:author]} #{msg[:action]} #{escape msg[:issue]} #{msg[:mentions]}",
+        :subtitle => "#{escape msg[:project_name]}"
+      }
+      widgets = [{
+        :keyValue => {
+          :topLabel => I18n.t("field_status"),
+          :content => escape(issue.status.to_s),
+          :contentMultiline => "false"
+          }
+      }, {
+        :keyValue => {
+          :topLabel => I18n.t("field_priority"),
+          :content => escape(issue.priority.to_s),
+          :contentMultiline => "false"
         }
+      }]
+
+      widgets << {
+        :keyValue => {
+          :topLabel => I18n.t("field_assigned_to"),
+          :content => escape(issue.assigned_to.to_s),
+          :contentMultiline => "false"
+        }
+      } if issue.assigned_to
+
+      card[:sections] = [
+        {
+          :widgets => widgets
+        }
+		  ]
+
+      {
+        :card => card
+        
       }.to_json
+#       {
+#         :payload => {
+#           :action => 'opened',
+#           :issue => RedmineWebhook::IssueWrapper.new(issue).to_hash,
+#           :url => controller.issue_url(issue)
+#         }
+#       }.to_json
     end
 
     def journal_to_json(issue, journal, controller)
