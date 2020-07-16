@@ -133,6 +133,10 @@ module RedmineWebhook
 	# dashes and underscores and must start with a letter or number.
 	text.scan(/@[a-z0-9][a-z0-9_\-]*/).uniq
     end
+	  
+    def escape(msg)
+	msg.to_s.gsub("&", "&amp;").gsub("<", "&lt;").gsub(">", "&gt;")
+    end
 
 
     def post(webhooks, request_body)
