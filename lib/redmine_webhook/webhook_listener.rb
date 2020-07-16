@@ -58,7 +58,6 @@ module RedmineWebhook
         :project_name => issue.project,
         :author => issue.author.to_s,
         :action => "created",
-        :link => object_url(issue),
         :issue => issue,
         :mentions => "#{mentions issue.description}"
       }
