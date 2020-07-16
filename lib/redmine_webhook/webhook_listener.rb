@@ -140,6 +140,8 @@ module RedmineWebhook
 
 
     def post(webhooks, request_body)
+      cert_store = OpenSSL::X509::Store.new
+      cert_store.add_file('ca.pem')
       Thread.start do
         webhooks.each do |webhook|
           begin
@@ -147,6 +149,7 @@ module RedmineWebhook
               req.url webhook.url
               req.headers['Content-Type'] = 'application/json'
               req.body = request_body
+	      req.ssl[:cert_store] = cert_store
             end
           rescue => e
             Rails.logger.error e
