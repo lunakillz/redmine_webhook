@@ -147,7 +147,6 @@ module RedmineWebhook
               req.url webhook.url
               req.headers['Content-Type'] = 'application/json'
               req.body = request_body
-	      req.ssl => {:verify => false}
             end
           rescue => e
             Rails.logger.error e
